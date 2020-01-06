@@ -1,3 +1,15 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+api_v1_upload_image:
+    path: /api/v1/upload/image
+    methods: POST
+    controller: App\Action\Upload\UploadImageAction
+
+#api_v1_upload_video:
+#    path: /api/v1/upload/video
+#    methods: POST
+#    controller: App\Action\Upload\UploadVideoAction
+
+#api_v1_upload_file:
+#    path: /api/v1/upload/file
+#    methods: POST
+#    controller: App\Action\Upload\UploadFileAction
+

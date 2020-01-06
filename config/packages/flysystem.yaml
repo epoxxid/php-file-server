@@ -1,0 +1,14 @@
+flysystem:
+    storages:
+        images.original.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/%env(string:ORIGINAL_IMAGE_URL_PREFIX)%'
+        images.thumbnail.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/%env(string:THUMBNAIL_URL_PREFIX)%'
+        file.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/files'

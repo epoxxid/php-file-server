@@ -19,9 +19,17 @@ services:
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
+    App\Action\:
+        resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Service\Validator\Upload\UploadedImageValidator:
+        arguments:
+            $forbiddenExtensions: '%env(string:FORBIDDEN_FILE_EXTENSIONS)%'
+            $allowedExtensions: '%env(string:ALLOWED_IMAGE_EXTENSIONS)%'
+
+    App\Service\Upload\Image\ImageUploadResultFactory:
+        arguments:
+            $host: '%env(string:FILE_SERVER_HOST)%'
+            $originalImageUrlPrefix: '%env(string:ORIGINAL_IMAGE_URL_PREFIX)%'
+            $thumbnailUrlPrefix: '%env(string:THUMBNAIL_URL_PREFIX)%'
