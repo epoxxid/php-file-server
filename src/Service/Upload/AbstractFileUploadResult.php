@@ -21,6 +21,13 @@ abstract class AbstractFileUploadResult
         $this->fileUri = $fileUri;
     }
 
+    /**
+     * Returns general type of uploaded entity
+     * @return string
+     */
+    abstract public function getType(): string;
+
+
     /** @return string */
     public function getFileId(): string
     {

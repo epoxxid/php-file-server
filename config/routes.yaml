@@ -13,3 +13,16 @@ api_v1_upload_image:
 #    methods: POST
 #    controller: App\Action\Upload\UploadFileAction
 
+download_image:
+    path: /images/{path}
+    methods: GET
+    controller: App\Action\Download\DownloadImageAction
+    requirements:
+        path: '.+\.[a-z]{3,4}'
+
+download_file:
+    path: /files/{path}
+    methods: GET
+    controller: App\Action\Download\DownloadFileAction
+    requirements:
+        path: '.+\..{2,5}'

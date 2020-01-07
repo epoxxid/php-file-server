@@ -28,8 +28,18 @@ services:
             $forbiddenExtensions: '%env(string:FORBIDDEN_FILE_EXTENSIONS)%'
             $allowedExtensions: '%env(string:ALLOWED_IMAGE_EXTENSIONS)%'
 
+    App\Service\Upload\Image\ImageFilePathBuilder:
+        arguments:
+            $originalImagePathPrefix: '%env(string:ORIGINAL_IMAGE_PATH_PREFIX)%'
+            $thumbnailPathPrefix: '%env(string:THUMBNAIL_PATH_PREFIX)%'
+
     App\Service\Upload\Image\ImageUploadResultFactory:
         arguments:
             $host: '%env(string:FILE_SERVER_HOST)%'
-            $originalImageUrlPrefix: '%env(string:ORIGINAL_IMAGE_URL_PREFIX)%'
-            $thumbnailUrlPrefix: '%env(string:THUMBNAIL_URL_PREFIX)%'
+
+    App\Service\Image\ImageManager:
+        arguments:
+            $maxThumbnailSize: '%env(int:MAX_THUMBNAIL_SIZE)%'
+            $keepThumbnailRatio: '%env(bool:KEEP_THUMBNAIL_RATIO)%'
+            $thumbnailQuality: '%env(int:THUMBNAIL_QUALITY)%'
+

@@ -21,6 +21,7 @@ class ImageUploadResult extends AbstractFileUploadResult
         $this->thumbnailUri = $thumbnailUri;
     }
 
+
     public function getOriginalImageUri(): string
     {
         return $this->fileUri;
@@ -34,5 +35,10 @@ class ImageUploadResult extends AbstractFileUploadResult
     public function setThumbnailUri(string $thumbnailUri): void
     {
         $this->thumbnailUri = $thumbnailUri;
+    }
+
+    public function getType(): string
+    {
+        return 'image';
     }
 }

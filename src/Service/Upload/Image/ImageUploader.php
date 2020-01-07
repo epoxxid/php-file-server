@@ -2,6 +2,7 @@
 
 namespace App\Service\Upload\Image;
 
+use App\Service\Image\ImageManager;
 use League\Flysystem\FilesystemInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
@@ -11,44 +12,57 @@ use Throwable;
 class ImageUploader
 {
     /** @var FilesystemInterface */
-    private $imagesOriginalStorage;
-
-    /** @var FilesystemInterface */
-    private $imagesMediumStorage;
+    private $imageStorage;
 
     /** @var ImageUploadResultFactory */
     private $resultFactory;
 
+    /** @var ImageFilePathBuilder */
+    private $filePathBuilder;
+
+    /** @var ImageManager */
+    private $imageManager;
+
     public function __construct(
-        FilesystemInterface $imagesOriginalStorage,
-        FilesystemInterface $imagesThumbnailStorage,
+        FilesystemInterface $imageStorage,
+        ImageFilePathBuilder $filePathBuilder,
+        ImageManager $imageManager,
         ImageUploadResultFactory $resultFactory
     )
     {
-        $this->imagesOriginalStorage = $imagesOriginalStorage;
-        $this->imagesMediumStorage = $imagesThumbnailStorage;
+        $this->imageStorage = $imageStorage;
+        $this->filePathBuilder = $filePathBuilder;
         $this->resultFactory = $resultFactory;
+        $this->imageManager = $imageManager;
     }
 
     public function upload(UploadedFile $file): ImageUploadResult
     {
         try {
-            $fileName = $file->getFilename();
+            $fileName = $file->getClientOriginalName();
             $srcFilePath = $file->getRealPath();
 
-            $identifier = md5(uniqid('', true));
-            $targetFilePath = sprintf(
-                '%s/%s.%s',
-                substr($identifier, 0, 2),
-                substr($identifier, 2),
-                $file->getClientOriginalExtension()
+            // generate unique file identifier
+            $fileExt = $file->getClientOriginalExtension();
+            $fileId = $this->filePathBuilder->generateFileIdentifier($fileExt);
+
+            // build path and upload original file
+            $originalFilePath = $this->filePathBuilder->generateOriginalImagePath($fileId);
+            $this->uploadOriginalImage($originalFilePath, file_get_contents($srcFilePath));
+
+            // create thumbnail file
+            $thumbnailFile = $this->imageManager->generateThumbnail($srcFilePath, $fileExt);
+
+            // build path and upload thumbnail file
+            $thumbnailPath = $this->filePathBuilder->generateThumbnailPath($fileId);
+            $this->uploadThumbnail($thumbnailPath, $thumbnailFile);
+
+            return $this->resultFactory->createResult(
+                $fileId,
+                $fileName,
+                $originalFilePath,
+                $thumbnailPath
             );
-
-            $this->uploadOriginalImage($targetFilePath, file_get_contents($srcFilePath));
-//            $this->uploadMediumImage($targetFilePath, $srcFileContent);
-//            $this->uploadSmallImage($targetFilePath, $srcFileContent);
-
-            return $this->resultFactory->createResult($targetFilePath, $fileName);
         } catch (Throwable $e) {
             $msg = 'Unable to move uploaded file to the destination directory: ' . $e->getMessage();
             throw new UploadException($msg, $e->getCode(), $e);
@@ -56,16 +70,28 @@ class ImageUploader
     }
 
     /**
-     * @param string $targetFilePath
+     * @param string $originalImagePath
      * @param $srcFileContent
      */
-    private function uploadOriginalImage(string $targetFilePath, $srcFileContent): void
+    private function uploadOriginalImage(string $originalImagePath, $srcFileContent): void
     {
-        $success = $this->imagesOriginalStorage->put($targetFilePath, $srcFileContent);
+        $success = $this->imageStorage->put($originalImagePath, $srcFileContent);
 
         if (!$success) {
             throw new RuntimeException('Error occurred during original image file uploading');
         }
     }
 
+    /**
+     * @param string $thumbnailPath
+     * @param $srcFileContent
+     */
+    private function uploadThumbnail(string $thumbnailPath, $srcFileContent): void
+    {
+        $success = $this->imageStorage->put($thumbnailPath, $srcFileContent);
+
+        if (!$success) {
+            throw new RuntimeException('Error occurred during thumbnail file uploading');
+        }
+    }
 }

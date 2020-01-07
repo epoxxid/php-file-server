@@ -1,11 +1,6 @@
-# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
 flysystem:
     storages:
-        images.original.storage:
-            adapter: 'memory'
-        images.thumbnail.storage:
+        image.storage:
             adapter: 'memory'
         file.storage:
             adapter: 'memory'
-#            options:
-#                directory: '%kernel.project_dir%/var/storage/files'

@@ -8,40 +8,32 @@ class ImageUploadResultFactory
     /** @var string */
     private $host;
 
-    /** @var string */
-    private $originalImageUrlPrefix;
-
-    /** @var string */
-    private $thumbnailUrlPrefix;
-
-    public function __construct(
-        string $host,
-        string $originalImageUrlPrefix,
-        string $thumbnailUrlPrefix
-    )
+    public function __construct(string $host)
     {
         $this->host = $host;
-        $this->originalImageUrlPrefix = $originalImageUrlPrefix;
-        $this->thumbnailUrlPrefix = $thumbnailUrlPrefix;
     }
 
-    public function createResult(string $id, string $originalFileName): ImageUploadResult
+    public function createResult(
+        string $fileId,
+        string $fileName,
+        string $originalFilePath,
+        string $thumbnailPath
+    ): ImageUploadResult
     {
         return new ImageUploadResult(
-            $id,
-            $originalFileName,
-            $this->buildUri($this->originalImageUrlPrefix, $id),
-            $this->buildUri($this->thumbnailUrlPrefix, $id)
+            $fileId,
+            $fileName,
+            $this->buildUri($originalFilePath),
+            $this->buildUri($thumbnailPath)
         );
     }
 
-    /**
-     * @param string $urlPrefix
-     * @param string $id
-     * @return string
-     */
-    private function buildUri(string $urlPrefix, string $id): string
+/**
+ * @param string $filePath
+ * @return string
+ */
+    private function buildUri(string $filePath): string
     {
-        return sprintf('%s/%s/%s', $this->host, $urlPrefix, $id);
+        return sprintf('%s/images/%s', $this->host, $filePath);
     }
 }
