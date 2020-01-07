@@ -18,7 +18,7 @@ class ImageUploader
     private $resultFactory;
 
     /** @var ImageFilePathBuilder */
-    private $filePathBuilder;
+    private $pathBuilder;
 
     /** @var ImageManager */
     private $imageManager;
@@ -31,7 +31,7 @@ class ImageUploader
     )
     {
         $this->imageStorage = $imageStorage;
-        $this->filePathBuilder = $filePathBuilder;
+        $this->pathBuilder = $filePathBuilder;
         $this->resultFactory = $resultFactory;
         $this->imageManager = $imageManager;
     }
@@ -39,32 +39,31 @@ class ImageUploader
     public function upload(UploadedFile $file): ImageUploadResult
     {
         try {
-            $fileName = $file->getClientOriginalName();
-            $srcFilePath = $file->getRealPath();
-
             // generate unique file identifier
             $fileExt = $file->getClientOriginalExtension();
-            $fileId = $this->filePathBuilder->generateFileIdentifier($fileExt);
+            $fileId = $this->pathBuilder->generateFileIdentifier($fileExt);
+
+            $srcFilePath = $file->getRealPath();
 
             // build path and upload original file
-            $originalFilePath = $this->filePathBuilder->generateOriginalImagePath($fileId);
-            $this->uploadOriginalImage($originalFilePath, file_get_contents($srcFilePath));
+            $originalFilePath = $this->pathBuilder->generateOriginalImagePath($fileId);
+            $this->moveOriginalImageToDestinationDir($originalFilePath, file_get_contents($srcFilePath));
 
             // create thumbnail file
             $thumbnailFile = $this->imageManager->generateThumbnail($srcFilePath, $fileExt);
 
             // build path and upload thumbnail file
-            $thumbnailPath = $this->filePathBuilder->generateThumbnailPath($fileId);
-            $this->uploadThumbnail($thumbnailPath, $thumbnailFile);
+            $thumbnailPath = $this->pathBuilder->generateThumbnailPath($fileId);
+            $this->moveThumbnailToDestinationDir($thumbnailPath, $thumbnailFile);
 
             return $this->resultFactory->createResult(
                 $fileId,
-                $fileName,
+                $file->getClientOriginalName(),
                 $originalFilePath,
                 $thumbnailPath
             );
         } catch (Throwable $e) {
-            $msg = 'Unable to move uploaded file to the destination directory: ' . $e->getMessage();
+            $msg = 'Unable to upload image: ' . $e->getMessage();
             throw new UploadException($msg, $e->getCode(), $e);
         }
     }
@@ -73,12 +72,13 @@ class ImageUploader
      * @param string $originalImagePath
      * @param $srcFileContent
      */
-    private function uploadOriginalImage(string $originalImagePath, $srcFileContent): void
+    private function moveOriginalImageToDestinationDir(string $originalImagePath, $srcFileContent): void
     {
         $success = $this->imageStorage->put($originalImagePath, $srcFileContent);
 
         if (!$success) {
-            throw new RuntimeException('Error occurred during original image file uploading');
+            $template = 'Error during moving uploaded image to destination directory %s';
+            throw new RuntimeException(sprintf($template, $originalImagePath));
         }
     }
 
@@ -86,12 +86,13 @@ class ImageUploader
      * @param string $thumbnailPath
      * @param $srcFileContent
      */
-    private function uploadThumbnail(string $thumbnailPath, $srcFileContent): void
+    private function moveThumbnailToDestinationDir(string $thumbnailPath, $srcFileContent): void
     {
         $success = $this->imageStorage->put($thumbnailPath, $srcFileContent);
 
         if (!$success) {
-            throw new RuntimeException('Error occurred during thumbnail file uploading');
+            $template = 'Error during moving image thumbnail to destination directory %s';
+            throw new RuntimeException(sprintf($template, $thumbnailPath));
         }
     }
 }

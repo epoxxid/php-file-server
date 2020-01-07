@@ -3,15 +3,15 @@ api_v1_upload_image:
     methods: POST
     controller: App\Action\Upload\UploadImageAction
 
-#api_v1_upload_video:
-#    path: /api/v1/upload/video
-#    methods: POST
-#    controller: App\Action\Upload\UploadVideoAction
+api_v1_upload_video:
+    path: /api/v1/upload/video
+    methods: POST
+    controller: App\Action\Upload\UploadVideoAction
 
-#api_v1_upload_file:
-#    path: /api/v1/upload/file
-#    methods: POST
-#    controller: App\Action\Upload\UploadFileAction
+api_v1_upload_file:
+    path: /api/v1/upload/file
+    methods: POST
+    controller: App\Action\Upload\UploadFileAction
 
 download_image:
     path: /images/{path}
@@ -19,6 +19,13 @@ download_image:
     controller: App\Action\Download\DownloadImageAction
     requirements:
         path: '.+\.[a-z]{3,4}'
+
+download_video:
+    path: /videos/{path}
+    methods: GET
+    controller: App\Action\Download\DownloadVideoAction
+    requirements:
+        path: '.+\..{2,5}'
 
 download_file:
     path: /files/{path}

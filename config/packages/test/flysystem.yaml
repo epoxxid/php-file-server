@@ -2,5 +2,7 @@ flysystem:
     storages:
         image.storage:
             adapter: 'memory'
+        video.storage:
+            adapter: 'memory'
         file.storage:
             adapter: 'memory'
