@@ -14,11 +14,11 @@ abstract class AbstractFileUploadResult
     /** @var string */
     protected $fileName;
 
-    public function __construct(string $fileId, string $fileName, string $fileUri)
+    public function __construct(string $fileId, string $fileName, string $videoFileUri)
     {
         $this->fileId = $fileId;
         $this->fileName = $fileName;
-        $this->fileUri = $fileUri;
+        $this->fileUri = $videoFileUri;
     }
 
     /**
@@ -35,7 +35,7 @@ abstract class AbstractFileUploadResult
     }
 
     /** @return string */
-    public function getFileName(): string
+    public function getOriginalFileName(): string
     {
         return $this->fileName;
     }

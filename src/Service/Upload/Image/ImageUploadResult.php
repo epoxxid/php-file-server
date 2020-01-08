@@ -7,38 +7,35 @@ use App\Service\Upload\AbstractFileUploadResult;
 
 class ImageUploadResult extends AbstractFileUploadResult
 {
+    private const UPLOADED_ENTITY_TYPE = 'image';
+
     /** @var string */
-    private $thumbnailUri;
+    private $thumbnailImageUri;
 
     public function __construct(
         string $fileId,
         string $fileName,
         string $originalImageUri,
-        string $thumbnailUri
+        string $thumbnailImageUri
     )
     {
         parent::__construct($fileId, $fileName, $originalImageUri);
-        $this->thumbnailUri = $thumbnailUri;
+        $this->thumbnailImageUri = $thumbnailImageUri;
     }
-
 
     public function getOriginalImageUri(): string
     {
         return $this->fileUri;
     }
 
-    public function getThumbnailUri(): ?string
+    public function getThumbnailImageUri(): ?string
     {
-        return $this->thumbnailUri;
+        return $this->thumbnailImageUri;
     }
 
-    public function setThumbnailUri(string $thumbnailUri): void
-    {
-        $this->thumbnailUri = $thumbnailUri;
-    }
-
+    /** @inheritDoc */
     public function getType(): string
     {
-        return 'image';
+        return self::UPLOADED_ENTITY_TYPE;
     }
 }

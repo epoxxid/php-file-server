@@ -5,6 +5,7 @@ namespace App\Action\Upload;
 use App\Service\Responder\SerializerResponder;
 use App\Service\Upload\Video\VideoUploader;
 use App\Service\Validator\Upload\UploadedFileValidator;
+use App\Service\Validator\Upload\UploadedVideoValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -14,7 +15,7 @@ class UploadVideoAction
 {
     private const UPLOADED_FILE_PARAM = 'video';
 
-    /** @var UploadedFileValidator */
+    /** @var UploadedVideoValidator */
     private $validator;
 
     /** @var VideoUploader */
@@ -24,7 +25,7 @@ class UploadVideoAction
     private $responder;
 
     public function __construct(
-        UploadedFileValidator $validator,
+        UploadedVideoValidator $validator,
         VideoUploader $uploader,
         SerializerResponder $responder
     )

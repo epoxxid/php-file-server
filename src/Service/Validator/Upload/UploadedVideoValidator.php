@@ -2,7 +2,7 @@
 
 namespace App\Service\Validator\Upload;
 
-class UploadedImageValidator extends AbstractUploadedFileValidator
+class UploadedVideoValidator extends AbstractUploadedFileValidator
 {
     public function __construct(string $allowedExtensions = null)
     {

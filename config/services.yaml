@@ -8,8 +8,10 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        bind:
+            $serverHostName: '%env(string:FILE_SERVER_HOST)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -25,19 +27,18 @@ services:
 
     App\Service\Validator\Upload\UploadedImageValidator:
         arguments:
-            $forbiddenExtensions: '%env(string:FORBIDDEN_FILE_EXTENSIONS)%'
             $allowedExtensions: '%env(string:ALLOWED_IMAGE_EXTENSIONS)%'
 
-    App\Service\Upload\Image\ImageFilePathBuilder:
+    App\Service\Validator\Upload\UploadedVideoValidator:
         arguments:
-            $originalImagePathPrefix: '%env(string:ORIGINAL_IMAGE_PATH_PREFIX)%'
-            $thumbnailPathPrefix: '%env(string:THUMBNAIL_PATH_PREFIX)%'
+            $allowedExtensions: '%env(string:ALLOWED_VIDEO_EXTENSIONS)%'
 
-    App\Service\Upload\Image\ImageUploadResultFactory:
+    App\Service\Validator\Upload\UploadedFileValidator:
         arguments:
-            $host: '%env(string:FILE_SERVER_HOST)%'
+            $forbiddenExtensions: '%env(string:FORBIDDEN_FILE_EXTENSIONS)%'
 
-    App\Service\Image\ImageManager:
+
+    App\Service\Image\ImageThumbnailGenerator:
         arguments:
             $maxThumbnailSize: '%env(int:MAX_THUMBNAIL_SIZE)%'
             $keepThumbnailRatio: '%env(bool:KEEP_THUMBNAIL_RATIO)%'

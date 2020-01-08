@@ -2,12 +2,14 @@
 
 namespace App\Service\Upload\File;
 
+use App\Service\Upload\AbstractFileUploader;
+use App\Service\Upload\FilePathBuilder;
 use League\Flysystem\FilesystemInterface;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
 
-class FileUploader
+class FileUploader extends AbstractFileUploader
 {
     /** @var FilesystemInterface */
     private $fileStorage;
@@ -33,32 +35,25 @@ class FileUploader
     {
         try {
             $fileExt = $file->getClientOriginalExtension();
-            $fileId = $this->pathBuilder->generateFileIdentifier($fileExt);
+            $fileId = $this->pathBuilder->generateFileId();
 
             $srcFilePath = $file->getRealPath();
 
-            $targetFilePath = $this->pathBuilder->generateFilePath($fileId);
-            $this->moveFileToDestinationDir($targetFilePath, file_get_contents($srcFilePath));
+            $targetFilePath = $this->pathBuilder->generateOriginalFilePath($fileId, $fileExt);
+            $this->moveFileToDestinationDir(
+                $this->fileStorage,
+                $targetFilePath,
+                file_get_contents($srcFilePath)
+            );
 
-            $fileName = $file->getClientOriginalName();
-            return $this->resultFactory->createResult($fileId, $fileName, $targetFilePath);
-        } catch (\Throwable $e) {
+            return $this->resultFactory->createResult(
+                $fileId,
+                $file->getClientOriginalName(),
+                $targetFilePath
+            );
+        } catch (Throwable $e) {
             $msg = 'Unable to upload file: ' . $e->getMessage();
             throw new UploadException($msg, $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $originalImagePath
-     * @param $srcFileContent
-     */
-    private function moveFileToDestinationDir(string $originalImagePath, $srcFileContent): void
-    {
-        $success = $this->fileStorage->put($originalImagePath, $srcFileContent);
-
-        if (!$success) {
-            $template = 'Error during moving uploaded file to destination directory %s';
-            throw new RuntimeException(sprintf($template, $originalImagePath));
         }
     }
 }

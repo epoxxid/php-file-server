@@ -2,13 +2,13 @@
 
 namespace App\Service\Image;
 
-use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 use RuntimeException;
 use Throwable;
 
-class ImageManager
+class ImageThumbnailGenerator
 {
-    /** @var \Intervention\Image\ImageManager */
+    /** @var ImageManager */
     private $engine;
 
     /** @var int */
@@ -24,10 +24,10 @@ class ImageManager
         int $maxThumbnailSize,
         bool $keepThumbnailRatio,
         int $thumbnailQuality,
-        string $driver = 'gd'
+        string $driver = 'imagick'
     )
     {
-        $this->engine = new \Intervention\Image\ImageManager(['driver' => $driver]);
+        $this->engine = new ImageManager(['driver' => $driver]);
         $this->maxThumbnailSize = $maxThumbnailSize;
         $this->keepThumbnailRatio = $keepThumbnailRatio;
         $this->thumbnailQuality = $thumbnailQuality;
@@ -38,7 +38,7 @@ class ImageManager
      * @param string $fileExt
      * @return string
      */
-    public function generateThumbnail(string $filePath, string $fileExt): string
+    public function generateThumbnail(string $filePath, string $fileExt)
     {
         try {
             $image = $this->engine->make($filePath);
@@ -51,7 +51,7 @@ class ImageManager
                 $image->crop($minImageSize, $minImageSize);
             }
 
-            return (string)$image->encode($fileExt, $this->thumbnailQuality);
+            return $image->encode($fileExt, $this->thumbnailQuality)->stream();
         } catch (Throwable $e) {
             throw new RuntimeException(
                 sprintf(

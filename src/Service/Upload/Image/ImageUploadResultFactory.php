@@ -3,16 +3,10 @@
 
 namespace App\Service\Upload\Image;
 
-class ImageUploadResultFactory
+use App\Service\Upload\AbstractUploadResultFactory;
+
+class ImageUploadResultFactory extends AbstractUploadResultFactory
 {
-    /** @var string */
-    private $host;
-
-    public function __construct(string $host)
-    {
-        $this->host = $host;
-    }
-
     public function createResult(
         string $fileId,
         string $fileName,
@@ -26,14 +20,5 @@ class ImageUploadResultFactory
             $this->buildUri($originalFilePath),
             $this->buildUri($thumbnailPath)
         );
-    }
-
-/**
- * @param string $filePath
- * @return string
- */
-    private function buildUri(string $filePath): string
-    {
-        return sprintf('%s/images/%s', $this->host, $filePath);
     }
 }

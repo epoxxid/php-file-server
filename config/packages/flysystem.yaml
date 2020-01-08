@@ -1,14 +1,6 @@
 flysystem:
     storages:
-        image.storage:
-            adapter: 'local'
-            options:
-                directory: '%kernel.project_dir%/var/storage/images'
-        video.storage:
-            adapter: 'local'
-            options:
-                directory: '%kernel.project_dir%/var/storage/videos'
         file.storage:
             adapter: 'local'
             options:
-                directory: '%kernel.project_dir%/var/storage/files'
+                directory: '%kernel.project_dir%/var/storage'

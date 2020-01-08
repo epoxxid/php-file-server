@@ -13,23 +13,9 @@ api_v1_upload_file:
     methods: POST
     controller: App\Action\Upload\UploadFileAction
 
-download_image:
-    path: /images/{path}
-    methods: GET
-    controller: App\Action\Download\DownloadImageAction
-    requirements:
-        path: '.+\.[a-z]{3,4}'
-
-download_video:
-    path: /videos/{path}
-    methods: GET
-    controller: App\Action\Download\DownloadVideoAction
-    requirements:
-        path: '.+\..{2,5}'
-
 download_file:
-    path: /files/{path}
+    path: /dl/{path}
     methods: GET
     controller: App\Action\Download\DownloadFileAction
     requirements:
-        path: '.+\..{2,5}'
+        path: '.+\.[a-z]{3,4}'
